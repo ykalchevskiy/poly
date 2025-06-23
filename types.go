@@ -1,5 +1,7 @@
 package poly
 
+// TypeList is a recursive type that represents a list of types.
+// It is used to provide a variadic number of types to a generic function.
 type TypeList[First TypeName, Rest Types] struct{}
 
 func (TypeList[First, Rest]) Types() []Type {
@@ -7,12 +9,14 @@ func (TypeList[First, Rest]) Types() []Type {
 	return append([]Type{NewType[First]()}, r.Types()...)
 }
 
+// TypeListLast is the terminating type for TypeList, representing the end of the list.
 type TypeListLast struct{}
 
 func (TypeListLast) Types() []Type {
 	return nil
 }
 
+// Types1 represents a list containing a single type.
 type Types1[T1 TypeName] struct{}
 
 func (Types1[T1]) Types() []Type {
@@ -21,6 +25,7 @@ func (Types1[T1]) Types() []Type {
 	}
 }
 
+// Types2 represents a list containing two types.
 type Types2[T1, T2 TypeName] struct{}
 
 func (Types2[T1, T2]) Types() []Type {
@@ -30,6 +35,7 @@ func (Types2[T1, T2]) Types() []Type {
 	}
 }
 
+// Types3 represents a list containing three types.
 type Types3[T1, T2, T3 TypeName] struct{}
 
 func (Types3[T1, T2, T3]) Types() []Type {
@@ -40,6 +46,7 @@ func (Types3[T1, T2, T3]) Types() []Type {
 	}
 }
 
+// Types4 represents a list containing four types.
 type Types4[T1, T2, T3, T4 TypeName] struct{}
 
 func (Types4[T1, T2, T3, T4]) Types() []Type {
@@ -51,7 +58,7 @@ func (Types4[T1, T2, T3, T4]) Types() []Type {
 	}
 }
 
-
+// Types5 represents a list containing five types.
 type Types5[T1, T2, T3, T4, T5 TypeName] struct{}
 
 func (Types5[T1, T2, T3, T4, T5]) Types() []Type {
@@ -64,6 +71,7 @@ func (Types5[T1, T2, T3, T4, T5]) Types() []Type {
 	}
 }
 
+// Types6 represents a list containing six types.
 type Types6[T1, T2, T3, T4, T5, T6 TypeName] struct{}
 
 func (Types6[T1, T2, T3, T4, T5, T6]) Types() []Type {
@@ -77,6 +85,7 @@ func (Types6[T1, T2, T3, T4, T5, T6]) Types() []Type {
 	}
 }
 
+// Types7 represents a list containing seven types.
 type Types7[T1, T2, T3, T4, T5, T6, T7 TypeName] struct{}
 
 func (Types7[T1, T2, T3, T4, T5, T6, T7]) Types() []Type {
@@ -91,6 +100,7 @@ func (Types7[T1, T2, T3, T4, T5, T6, T7]) Types() []Type {
 	}
 }
 
+// Types8 represents a list containing eight types.
 type Types8[T1, T2, T3, T4, T5, T6, T7, T8 TypeName] struct{}
 
 func (Types8[T1, T2, T3, T4, T5, T6, T7, T8]) Types() []Type {
@@ -106,6 +116,7 @@ func (Types8[T1, T2, T3, T4, T5, T6, T7, T8]) Types() []Type {
 	}
 }
 
+// Types9 represents a list containing nine types.
 type Types9[T1, T2, T3, T4, T5, T6, T7, T8, T9 TypeName] struct{}
 
 func (Types9[T1, T2, T3, T4, T5, T6, T7, T8, T9]) Types() []Type {

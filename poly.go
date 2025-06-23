@@ -9,15 +9,18 @@ import (
 	"reflect"
 )
 
+// TypeName is an interface that types must implement to provide their unique name for polymorphic serialization.
 type TypeName interface {
 	TypeName() string
 }
 
+// Type holds the name and reflect.Type of a registered polymorphic type.
 type Type struct {
 	Name        string
 	ReflectType reflect.Type
 }
 
+// NewType creates a new Type instance for a given TypeName.
 func NewType[T TypeName]() Type {
 	var t T
 	return Type{
@@ -26,14 +29,20 @@ func NewType[T TypeName]() Type {
 	}
 }
 
+// Types is an interface that provides a list of all registered polymorphic types.
 type Types interface {
 	Types() []Type
 }
 
+// Poly is a generic struct that wraps an interface and handles polymorphic JSON marshaling and unmarshaling.
+// I is the interface type that the concrete types implement.
+// T is a type that implements the Types interface, providing the list of known concrete types.
 type Poly[I any, T Types] struct {
 	Value I
 }
 
+// MarshalJSON implements the json.Marshaler interface for Poly.
+// It marshals the underlying value along with its TypeName as a discriminator.
 func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 	implData, err := json.Marshal(p.Value)
 	if err != nil {
@@ -76,6 +85,8 @@ func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// UnmarshalJSON implements the json.Unmarshaler interface for Poly.
+// It unmarshals the JSON based on the 'type' discriminator field to the correct concrete type.
 func (p *Poly[I, T]) UnmarshalJSON(b []byte) error {
 	if bytes.Equal(b, []byte("null")) {
 		return nil
