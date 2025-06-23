@@ -13,6 +13,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/ykalchevskiy/poly"
 )
@@ -24,15 +25,14 @@ type IsAction interface {
 
 type ActionDismiss struct{}
 
-func (ActionDismiss) IsAction() {}
+func (ActionDismiss) IsAction()        {}
 func (ActionDismiss) TypeName() string { return "dismiss" }
 
 type ActionDeepLink struct {
 	URL string `json:"url"`
 }
 
-func (ActionDeepLink) IsAction() {}
-
+func (ActionDeepLink) IsAction()        {}
 func (ActionDeepLink) TypeName() string { return "deep-link" }
 
 type Action = poly.Poly[IsAction, poly.Types2[ActionDismiss, ActionDeepLink]]
@@ -42,12 +42,12 @@ func main() {
 	var bytes []byte
 
 	_ = json.Unmarshal([]byte(`{"type":"dismiss"}`), &action)
-	fmt.Println("%T", action.Value) // ActionDismiss
+	fmt.Printf("%T\n", action.Value) // ActionDismiss
 	bytes, _ = json.Marshal(action)
 	fmt.Println(string(bytes)) // {"type":"dismiss"}
 
 	_ = json.Unmarshal([]byte(`{"type":"deep-link","url":"url1"}`), &action)
-	fmt.Println("%T", action.Value) // ActionDeepLink
+	fmt.Printf("%T\n", action.Value) // ActionDeepLink
 	bytes, _ = json.Marshal(action)
 	fmt.Println(string(bytes)) // {"type":"deep-link","url":"url1"}
 
@@ -58,4 +58,4 @@ func main() {
 }
 ```
 
-See also `polygen` generator for more features: https://github.com/ykalchevsiy/polygen
+See also `polygen` generator for more features: https://github.com/ykalchevskiy/polygen
