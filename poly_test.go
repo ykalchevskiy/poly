@@ -272,7 +272,10 @@ func TestPoly_ItemValue(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unknown should err")
 		}
-		if !strings.Contains(err.Error(), "poly: unknown TypeName item-value-unknown to unmarshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: unknown TypeName item-value-unknown to unmarshal",
+		) {
 			t.Fatalf("expected unknown TypeName error, got %v", err)
 		}
 	})
@@ -296,7 +299,10 @@ func TestPoly_ItemValue(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unimplemented should err")
 		}
-		if !strings.Contains(err.Error(), "poly: unknown TypeName item-value-unimplemented-is to unmarshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: unknown TypeName item-value-unimplemented-is to unmarshal",
+		) {
 			t.Fatalf("expected unknown TypeName error, got %v", err)
 		}
 	})
@@ -308,7 +314,10 @@ func TestPoly_ItemValue(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unknown should err")
 		}
-		if !strings.Contains(err.Error(), "poly: cannot get TypeName of poly_test.ItemValueUnimplementedTypeName to unmarshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: cannot get TypeName of poly_test.ItemValueUnimplementedTypeName to unmarshal",
+		) {
 			t.Fatalf("expected unknown type error, got %v", err)
 		}
 	})
@@ -320,7 +329,10 @@ func TestPoly_ItemValue(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unknown should err")
 		}
-		if !strings.Contains(err.Error(), "poly: cannot get TypeName of poly_test.ItemValueUnimplementedTypeName to marshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: cannot get TypeName of poly_test.ItemValueUnimplementedTypeName to marshal",
+		) {
 			t.Fatalf("expected unknown type error, got %v", err)
 		}
 	})
@@ -348,7 +360,9 @@ func TestPoly_ItemValue(t *testing.T) {
 	})
 
 	t.Run("inner", func(t *testing.T) {
-		bIn := []byte(`{"ItemV":{"type":"item-value-1"},"ItemP":{"type":"item-value-2","key2":"k2"}}`)
+		bIn := []byte(
+			`{"ItemV":{"type":"item-value-1"},"ItemP":{"type":"item-value-2","key2":"k2"}}`,
+		)
 
 		var inner ItemValueInner
 
@@ -441,7 +455,10 @@ func TestPoly_ItemPointer(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unknown should err")
 		}
-		if !strings.Contains(err.Error(), "poly: unknown TypeName item-pointer-unknown to unmarshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: unknown TypeName item-pointer-unknown to unmarshal",
+		) {
 			t.Fatalf("expected unknown TypeName error, got %v", err)
 		}
 	})
@@ -465,7 +482,10 @@ func TestPoly_ItemPointer(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unimplemented should err")
 		}
-		if !strings.Contains(err.Error(), "poly: unknown TypeName item-pointer-unimplemented-is to unmarshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: unknown TypeName item-pointer-unimplemented-is to unmarshal",
+		) {
 			t.Fatalf("expected unknown TypeName error, got %v", err)
 		}
 	})
@@ -477,7 +497,10 @@ func TestPoly_ItemPointer(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unknown should err")
 		}
-		if !strings.Contains(err.Error(), "poly: cannot get TypeName of *poly_test.ItemPointerUnimplementedTypeName to unmarshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: cannot get TypeName of *poly_test.ItemPointerUnimplementedTypeName to unmarshal",
+		) {
 			t.Fatalf("expected unknown type error, got %v", err)
 		}
 	})
@@ -489,7 +512,10 @@ func TestPoly_ItemPointer(t *testing.T) {
 		if err == nil {
 			t.Fatal("unmarshaling unknown should err")
 		}
-		if !strings.Contains(err.Error(), "poly: cannot get TypeName of *poly_test.ItemPointerUnimplementedTypeName to marshal") {
+		if !strings.Contains(
+			err.Error(),
+			"poly: cannot get TypeName of *poly_test.ItemPointerUnimplementedTypeName to marshal",
+		) {
 			t.Fatalf("expected unknown type error, got %v", err)
 		}
 	})
@@ -517,7 +543,9 @@ func TestPoly_ItemPointer(t *testing.T) {
 	})
 
 	t.Run("inner", func(t *testing.T) {
-		bIn := []byte(`{"ItemV":{"type":"item-pointer-1"},"ItemP":{"type":"item-pointer-2","key2":"k2"}}`)
+		bIn := []byte(
+			`{"ItemV":{"type":"item-pointer-1"},"ItemP":{"type":"item-pointer-2","key2":"k2"}}`,
+		)
 
 		var inner ItemPointerInner
 

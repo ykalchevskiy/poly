@@ -6,6 +6,7 @@ type TypeList[First TypeName, Rest Types] struct{}
 
 func (TypeList[First, Rest]) Types() []Type {
 	var r Rest
+
 	return append([]Type{NewType[First]()}, r.Types()...)
 }
 

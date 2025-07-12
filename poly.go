@@ -47,7 +47,7 @@ type Poly[I any, T Types] struct {
 func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 	implData, err := json.Marshal(p.Value)
 	if err != nil {
-		return nil, fmt.Errorf("poly: cannot marshal value %v: %v", p.Value, err)
+		return nil, fmt.Errorf("poly: cannot marshal value %v: %w", p.Value, err)
 	}
 
 	if bytes.Equal(implData, []byte("null")) {
@@ -61,11 +61,15 @@ func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 
 	typeName := tnValue.TypeName()
 
-	var found bool
-	var t T
+	var (
+		t     T
+		found bool
+	)
+
 	for _, typ := range t.Types() {
 		if typeName == typ.Name {
 			found = true
+
 			break
 		}
 	}
@@ -88,8 +92,8 @@ func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements the json.Unmarshaler interface for Poly.
 // It unmarshals the JSON based on the 'type' discriminator field to the correct concrete type.
-func (p *Poly[I, T]) UnmarshalJSON(b []byte) error {
-	if bytes.Equal(b, []byte("null")) {
+func (p *Poly[I, T]) UnmarshalJSON(data []byte) error {
+	if bytes.Equal(data, []byte("null")) {
 		return nil
 	}
 
@@ -109,8 +113,8 @@ func (p *Poly[I, T]) UnmarshalJSON(b []byte) error {
 		TypeName: typeName,
 	}
 
-	if err := json.Unmarshal(b, &discriminator); err != nil {
-		return fmt.Errorf("poly: cannot unmarshal discriminator 'type': %v", err)
+	if err := json.Unmarshal(data, &discriminator); err != nil {
+		return fmt.Errorf("poly: cannot unmarshal discriminator 'type': %w", err)
 	}
 
 	if discriminator.TypeName == "" {
@@ -124,15 +128,12 @@ func (p *Poly[I, T]) UnmarshalJSON(b []byte) error {
 		}
 
 		// if there was no value yet or it's a new type, we create a new value
-		if typeName == "" || typeName != typ.Name {
-			ptr := reflect.New(typ.ReflectType)
-			if err := json.Unmarshal(b, ptr.Interface()); err != nil {
-				return fmt.Errorf("poly: cannot unmarshal '%s': %v", typ.ReflectType, err)
+		if typeName != typ.Name {
+			value, err := unmarshalNew(data, typ, false, p.Value)
+			if err != nil {
+				return err
 			}
-			value, ok := ptr.Elem().Interface().(I)
-			if !ok {
-				return fmt.Errorf("poly: cannon use '%v' as I", ptr.Interface())
-			}
+
 			p.Value = value
 
 			return nil
@@ -140,26 +141,42 @@ func (p *Poly[I, T]) UnmarshalJSON(b []byte) error {
 
 		// if there is a pointer to a struct, we can use it directly
 		if reflect.ValueOf(p.Value).Kind() == reflect.Pointer {
-			if err := json.Unmarshal(b, p.Value); err != nil {
-				return fmt.Errorf("poly: cannot unmarshal '%s': %v", typ.ReflectType, err)
+			if err := json.Unmarshal(data, p.Value); err != nil {
+				return fmt.Errorf("poly: cannot unmarshal '%s': %w", typ.ReflectType, err)
 			}
+
 			return nil
 		}
 
 		// otherwise we should create a pointer and copy the existing value there
-		ptr := reflect.New(typ.ReflectType)
-		ptr.Elem().Set(reflect.ValueOf(p.Value))
-		if err := json.Unmarshal(b, ptr.Interface()); err != nil {
-			return fmt.Errorf("poly: cannot unmarshal '%s': %v", typ.ReflectType, err)
+		value, err := unmarshalNew(data, typ, true, p.Value)
+		if err != nil {
+			return err
 		}
-		value, ok := ptr.Elem().Interface().(I)
-		if !ok {
-			return fmt.Errorf("poly: cannon use '%v' as I", ptr.Interface())
-		}
+
 		p.Value = value
 
 		return nil
 	}
 
 	return fmt.Errorf("poly: unknown TypeName %s to unmarshal", discriminator.TypeName)
+}
+
+func unmarshalNew[I any](data []byte, typ Type, useCurrent bool, current I) (I, error) {
+	ptr := reflect.New(typ.ReflectType)
+
+	if useCurrent {
+		ptr.Elem().Set(reflect.ValueOf(current))
+	}
+
+	if err := json.Unmarshal(data, ptr.Interface()); err != nil {
+		return current, fmt.Errorf("poly: cannot unmarshal '%s': %w", typ.ReflectType, err)
+	}
+
+	value, ok := ptr.Elem().Interface().(I)
+	if !ok {
+		return current, fmt.Errorf("poly: cannot use '%v' as I", ptr.Interface())
+	}
+
+	return value, nil
 }
