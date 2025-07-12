@@ -1,0 +1,28 @@
+version: "2"
+
+linters:
+  default: all
+
+  disable:
+    - err113
+    - ireturn
+    - noinlineerr
+    - revive
+  
+  exclusions:
+    paths:
+      - ".+_test.go"
+
+  settings:
+    cyclop:
+      max-complexity: 15
+    funlen:
+      lines: 100
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+    - golines

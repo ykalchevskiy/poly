@@ -1,4 +1,4 @@
-name: Test
+name: Checks
 
 on:
   push:
@@ -7,12 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run Tests
+  checks:
+    name: Run checks
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.18', '1.20', '1.22', '1.24']
+        go-version: ['1.18', '1.22', '1.23', '1.24']
 
     steps:
     - uses: actions/checkout@v4
@@ -21,7 +21,11 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: ${{ matrix.go-version }}
-        cache: true
 
     - name: Run tests
       run: go test -v ./...
+
+    - name: Run linters
+      uses: golangci/golangci-lint-action@v8
+      with:
+        version: v2.2.2
