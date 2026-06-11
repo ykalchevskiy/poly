@@ -82,9 +82,14 @@ func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 		return []byte(fmt.Sprintf(`{"type":"%s"}`, typeName)), nil
 	}
 
+	if len(implData) == 0 || implData[0] != '{' {
+		return nil, fmt.Errorf("poly: expected JSON object for %T, got %s", p.Value, implData)
+	}
+
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf(`{"type":"%s",`, typeName))
+	buf.Grow(len(`{"type":"",`) + len(typeName) + len(implData) - 1)
+	fmt.Fprintf(&buf, `{"type":"%s",`, typeName)
 	buf.Write(implData[1:])
 
 	return buf.Bytes(), nil
@@ -94,12 +99,18 @@ func (p Poly[I, T]) MarshalJSON() ([]byte, error) {
 // It unmarshals the JSON based on the 'type' discriminator field to the correct concrete type.
 func (p *Poly[I, T]) UnmarshalJSON(data []byte) error {
 	if bytes.Equal(data, []byte("null")) {
+		var zero I
+
+		p.Value = zero
+
 		return nil
 	}
 
 	var typeName string
 
-	if reflectValue := reflect.ValueOf(p.Value); reflectValue.IsValid() {
+	reflectValue := reflect.ValueOf(p.Value)
+
+	if reflectValue.IsValid() {
 		if tnValue, ok := reflectValue.Interface().(TypeName); ok {
 			typeName = tnValue.TypeName()
 		} else {
@@ -139,8 +150,8 @@ func (p *Poly[I, T]) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 
-		// if there is a pointer to a struct, we can use it directly
-		if reflect.ValueOf(p.Value).Kind() == reflect.Pointer {
+		// if there is a non-nil pointer to a struct, we can use it directly
+		if reflectValue.Kind() == reflect.Pointer && !reflectValue.IsNil() {
 			if err := json.Unmarshal(data, p.Value); err != nil {
 				return fmt.Errorf("poly: cannot unmarshal '%s': %w", typ.ReflectType, err)
 			}
