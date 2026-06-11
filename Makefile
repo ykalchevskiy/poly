@@ -8,4 +8,13 @@ lint:
 
 .PHONY: test
 test:
+	go test -v -count 1 ./...
+	GOEXPERIMENT=jsonv2 go test -v -count 1 ./...
+
+.PHONY: test-v1
+test-v1:
 	go test -v ./...
+
+.PHONY: test-v2
+test-v2:
+	GOEXPERIMENT=jsonv2 go test -v ./...
