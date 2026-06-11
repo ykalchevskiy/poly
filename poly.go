@@ -1,4 +1,4 @@
-// Package poly allows polymorphic serialization.
+// Package poly allows polymorphic encoding and decoding of JSON in Go.
 package poly
 
 import (
