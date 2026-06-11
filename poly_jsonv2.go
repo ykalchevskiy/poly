@@ -4,12 +4,11 @@ package poly
 
 import (
 	"bytes"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"reflect"
-
-	"encoding/json/jsontext"
-	"encoding/json/v2"
 )
 
 // MarshalJSONTo implements the json.MarshalerTo interface for Poly.
@@ -49,12 +48,17 @@ func (p Poly[I, T]) MarshalJSONTo(enc *jsontext.Encoder) error {
 	}
 
 	if bytes.Equal(implData, []byte("{}")) {
-		return enc.WriteValue([]byte(fmt.Sprintf(`{"type":"%s"}`, typeName)))
+		return enc.WriteValue([]byte(fmt.Sprintf(`{"type":"%s"}`, typeName))) //nolint:modernize
+	}
+
+	if len(implData) == 0 || implData[0] != '{' {
+		return fmt.Errorf("poly: expected JSON object for %T, got %s", p.Value, implData)
 	}
 
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf(`{"type":"%s",`, typeName))
+	buf.Grow(len(implData) - 1 + len(`{"type":"",`) + len(typeName))
+	fmt.Fprintf(&buf, `{"type":"%s",`, typeName)
 	buf.Write(implData[1:])
 
 	return enc.WriteValue(buf.Bytes())
@@ -65,7 +69,9 @@ func (p Poly[I, T]) MarshalJSONTo(enc *jsontext.Encoder) error {
 func (p *Poly[I, T]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	var typeName string
 
-	if reflectValue := reflect.ValueOf(p.Value); reflectValue.IsValid() {
+	reflectValue := reflect.ValueOf(p.Value)
+
+	if reflectValue.IsValid() {
 		if tnValue, ok := reflectValue.Interface().(TypeName); ok {
 			typeName = tnValue.TypeName()
 		} else {
@@ -86,6 +92,10 @@ func (p *Poly[I, T]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	}
 
 	if fullData == nil {
+		var zero I
+
+		p.Value = zero
+
 		return nil
 	}
 
@@ -111,8 +121,8 @@ func (p *Poly[I, T]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 			return nil
 		}
 
-		// if there is a pointer to a struct, we can use it directly
-		if reflect.ValueOf(p.Value).Kind() == reflect.Pointer {
+		// if there is a non-nil pointer to a struct, we can use it directly
+		if reflectValue.Kind() == reflect.Pointer && !reflectValue.IsNil() {
 			if err := json.Unmarshal(fullData.Data, p.Value, dec.Options()); err != nil {
 				return fmt.Errorf("poly: cannot unmarshal '%s': %w", typ.ReflectType, err)
 			}

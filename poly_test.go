@@ -239,7 +239,7 @@ func TestPoly_ItemValue(t *testing.T) {
 		}
 
 		if got, ok := item.Value.(ItemValue2); !ok {
-			t.Fatalf("expected ItemValue1, got %T", got)
+			t.Fatalf("expected ItemValue2, got %T", got)
 		}
 
 		bOut, err := json.Marshal(item)
@@ -346,7 +346,7 @@ func TestPoly_ItemValue(t *testing.T) {
 		}
 
 		if got, ok := item.Value.(ItemValue2); !ok {
-			t.Fatalf("expected ItemValue1, got %T", got)
+			t.Fatalf("expected ItemValue2, got %T", got)
 		}
 	})
 
@@ -539,6 +539,36 @@ func TestPoly_ItemPointer(t *testing.T) {
 		rValue := reflect.ValueOf(item)
 		if !rValue.Field(0).Elem().Elem().Field(0).CanSet() {
 			t.Fatalf("pointer must be settable")
+		}
+	})
+
+	t.Run("unmarshal into typed nil pointer 1", func(t *testing.T) {
+		var typedNil *ItemPointer1
+		item := ItemPointer{Value: typedNil}
+
+		err := json.Unmarshal([]byte(`{"type":"item-pointer-2","key":"updated_key"}`), &item)
+		if err != nil {
+			t.Fatalf("unmarshaling error: %v", err)
+		} else {
+			res, ok := item.Value.(*ItemPointer2)
+			if !ok || res == nil || res.Key != "updated_key" {
+				t.Fatalf("wrong data")
+			}
+		}
+	})
+
+	t.Run("unmarshal into typed nil pointer 2", func(t *testing.T) {
+		var typedNil *ItemPointer2
+		item := ItemPointer{Value: typedNil}
+
+		err := json.Unmarshal([]byte(`{"type":"item-pointer-2","key":"updated_key"}`), &item)
+		if err != nil {
+			t.Fatalf("unmarshaling error: %v", err)
+		} else {
+			res, ok := item.Value.(*ItemPointer2)
+			if !ok || res == nil || res.Key != "updated_key" {
+				t.Fatalf("wrong data")
+			}
 		}
 	})
 
