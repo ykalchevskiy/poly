@@ -57,7 +57,7 @@ func (p Poly[I, T]) MarshalJSONTo(enc *jsontext.Encoder) error {
 
 	var buf bytes.Buffer
 
-	buf.Grow(len(implData) - 1 + len(`{"type":"",`) + len(typeName))
+	buf.Grow(len(`{"type":"",`) + len(typeName) + len(implData) - 1)
 	fmt.Fprintf(&buf, `{"type":"%s",`, typeName)
 	buf.Write(implData[1:])
 
