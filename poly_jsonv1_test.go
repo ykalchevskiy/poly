@@ -26,10 +26,7 @@ func TestPoly_JSONOptionsAreNotReusedInV1(t *testing.T) {
 		dec := json.NewDecoder(bytes.NewReader(bIn))
 		dec.DisallowUnknownFields()
 		if err := dec.Decode(&item); err != nil {
-			t.Errorf(
-				"unexpected error: %v",
-				err,
-			)
+			t.Errorf("unexpected error: %v", err)
 		}
 	})
 }

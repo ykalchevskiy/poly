@@ -26,9 +26,7 @@ func TestPoly_JSONOptionsAreReusedInV2(t *testing.T) {
 		dec := json.NewDecoder(bytes.NewReader(bIn))
 		dec.DisallowUnknownFields()
 		if err := dec.Decode(&item); err == nil {
-			t.Errorf(
-				"expected error but got nil",
-			)
+			t.Errorf("expected error but got nil")
 		}
 	})
 }
