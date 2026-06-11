@@ -82,7 +82,7 @@ func (p *Poly[I, T]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	}
 
 	if err := json.UnmarshalDecode(dec, &fullData, json.RejectUnknownMembers(false)); err != nil {
-		return fmt.Errorf("poly: cannot unmarshal discriminator 'type': %w", err)
+		return fmt.Errorf("poly: cannot unmarshal: %w", err)
 	}
 
 	if fullData == nil {
