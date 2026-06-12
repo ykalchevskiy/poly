@@ -34,7 +34,7 @@ jobs:
     - name: Run linters
       uses: golangci/golangci-lint-action@v9
       with:
-        version: v2.2.2
+        version: v2.12.2
 
     - name: Run linters (jsonV2)
       if: matrix.go-version == '1.25' || matrix.go-version == '1.26'
